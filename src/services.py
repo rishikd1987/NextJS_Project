@@ -15,19 +15,39 @@ def get_db():
         db.close()
 
 """
-
 def get_candidate(db: _orm.Session, user_id: int):
     return db.query(_models.User).filter(_models.User.id == user_id).first()
-
-
-def get_user_by_email(db: _orm.Session, email: str):
-    return db.query(_models.User).filter(_models.User.email == email).first()
-
 """
 
-def get_candidates(db: _orm.Session, skip: int = 0, limit: int = 100):
-    return db.query(_models.Candidate).offset(skip).limit(limit).all()
+def get_candidate_by_email(db: _orm.Session, email: str):
+    return db.query(_models.Candidate).filter(_models.Candidate.email == email).first()
 
+def get_candidates(db: _orm.Session, skip: int = 0, limit: int = 500):
+    return db.query(_models.Candidate).offset(skip).limit(500).all()
+
+def get_candidate(db: _orm.Session, candidate_id: int):
+    return db.query(_models.Candidate).filter(_models.Candidate.id == candidate_id).first()
+
+def create_candidate(db: _orm.Session, candidate: _schemas.CandidateCreate):
+    db_candidate = _models.Candidate(firstname=candidate.firstname, surname=candidate.surname, email=candidate.email,mobile=candidate.mobile)
+    db.add(db_candidate)
+    db.commit()
+    db.refresh(db_candidate)
+    return db_candidate
+
+def update_candidate(db: _orm.Session, candidate_id: int, post: _schemas.CandidateCreate):
+    db_candidate = get_candidate(db=db, candidate_id=candidate_id)
+    db_candidate.firstname = post.firstname
+    db_candidate.surname = post.surname
+    db_candidate.email = post.email
+    db_candidate.mobile = post.mobile
+    db.commit()
+    db.refresh(db_candidate)
+    return db_candidate
+
+
+def get_jobs(db: _orm.Session, skip: int = 0, limit: int = 100):
+    return db.query(_models.Job).offset(skip).limit(limit).all()
 """
 
 def create_user(db: _orm.Session, user: _schemas.UserCreate):
@@ -60,12 +80,6 @@ def delete_post(db: _orm.Session, post_id: int):
     db.commit()
 
 
-def update_post(db: _orm.Session, post_id: int, post: _schemas.PostCreate):
-    db_post = get_post(db=db, post_id=post_id)
-    db_post.title = post.title
-    db_post.content = post.content
-    db.commit()
-    db.refresh(db_post)
-    return db_post
+
 
 """
